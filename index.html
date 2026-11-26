@@ -1,45 +1,142 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gravity Shift — V1</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <main class="game-shell">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">PHYSICS PLATFORMER</p>
-        <h1>GRAVITY <span>SHIFT</span></h1>
-      </div>
-      <div class="status">
-        <span class="status-label">GRAVITY</span>
-        <strong id="gravityStatus">↓ DOWN</strong>
-      </div>
-    </header>
-
-    <section class="game-frame">
-      <canvas id="gameCanvas" width="960" height="540" aria-label="Gravity Shift game"></canvas>
-      <div class="overlay" id="overlay">
-        <div class="overlay-card">
-          <p class="eyebrow" id="overlayEyebrow">MISSION 01</p>
-          <h2 id="overlayTitle">Gravity Shift</h2>
-          <p id="overlayText">Reach the exit. Flip gravity to navigate the facility.</p>
-          <button id="startButton">START GAME</button>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#080b16" />
+    <title>Gravity Shift — Campaign</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main id="app">
+      <section id="menu" class="screen menu active">
+        <header>
+          <div class="brand">GS<span>///</span></div>
+          <div class="build">BUILD <b>V2.1</b></div>
+        </header>
+        <div class="hero">
+          <div class="copy">
+            <p class="eyebrow">● GRAVITY IS YOUR WEAPON</p>
+            <h1>UP<br /><em>FALL</em></h1>
+            <p class="intro">
+              Defy the direction of the world.<br />Master gravity. Find your
+              way out.
+            </p>
+            <div class="actions">
+              <button class="primary" id="play">
+                ▶ &nbsp; CONTINUE CAMPAIGN</button
+              ><button class="secondary" id="levelSelectBtn">
+                SELECT LEVEL</button
+              ><button class="secondary" id="how">HOW TO PLAY ↗</button>
+            </div>
+            <p class="progress-note" id="progressNote">
+              MISSION PROGRESS: 0 / 10
+            </p>
+          </div>
+          <div class="art">
+            <div class="orbit o1"></div>
+            <div class="orbit o2"></div>
+            <div class="planet"><i></i></div>
+            <div class="float f1"></div>
+            <div class="float f2"></div>
+            <div class="float f3"></div>
+            <div class="mini-player"></div>
+            <small>GRAVITY FIELD <b>ACTIVE</b></small>
+          </div>
         </div>
-      </div>
-    </section>
-
-    <footer class="controls">
-      <div><kbd>A</kbd><kbd>D</kbd> <span>Move</span></div>
-      <div><kbd>←</kbd><kbd>→</kbd> <span>Move</span></div>
-      <div><kbd>SPACE</kbd> <span>Jump</span></div>
-      <div><kbd>G</kbd> <span>Flip gravity</span></div>
-      <div><kbd>R</kbd> <span>Restart</span></div>
-    </footer>
-    <p class="hint">Tip: You can land on platforms from above or below. Gravity is your tool.</p>
-  </main>
-  <script src="game.js"></script>
-</body>
+        <footer>
+          <span>© GRAVITY SHIFT PROJECT</span
+          ><span>HTML · CSS · JAVASCRIPT</span><span>10 MISSIONS</span>
+        </footer>
+        <div class="modal" id="help">
+          <div class="modal-card">
+            <button class="close" id="close">×</button>
+            <p class="eyebrow">QUICK BRIEFING</p>
+            <h2>HOW TO PLAY</h2>
+            <div class="keys">
+              <p><kbd>A</kbd><kbd>D</kbd> or <kbd>←</kbd><kbd>→</kbd> Move</p>
+              <p><kbd>SPACE</kbd> / <kbd>W</kbd> / <kbd>↑</kbd> Jump</p>
+              <p><kbd>G</kbd> Reverse gravity</p>
+              <p><kbd>ESC</kbd> Pause / resume</p>
+              <p><kbd>R</kbd> Restart level</p>
+            </div>
+            <p class="note">
+              Avoid hazards, use gravity to reach unusual platforms, and enter
+              the glowing exit portal.
+            </p>
+          </div>
+        </div>
+        <div class="modal" id="levelModal">
+          <div class="modal-card level-modal">
+            <button class="close" id="closeLevels">×</button>
+            <p class="eyebrow">MISSION SELECT</p>
+            <h2>CHOOSE A LEVEL</h2>
+            <div id="levelGrid" class="level-grid"></div>
+            <p class="note">Complete a mission to unlock the next one.</p>
+          </div>
+        </div>
+      </section>
+      <section id="game" class="screen game">
+        <header class="game-head">
+          <button class="icon" id="toMenu">←</button>
+          <div class="game-title">
+            GRAVITY <b>SHIFT</b
+            ><small>FACILITY // <span id="facilityNo">01</span></small>
+          </div>
+          <div class="mission">
+            <small>CURRENT MISSION</small><b id="levelName">FIRST CONTACT</b>
+          </div>
+          <div class="score"><small>SCORE</small><b id="score">0000</b></div>
+          <div class="gravity">
+            <span id="arrow">↓</span>
+            <div><small>GRAVITY</small><b id="gravity">DOWN</b></div>
+          </div>
+          <button class="icon" id="pause">Ⅱ</button>
+        </header>
+        <div class="playfield">
+          <canvas id="canvas" width="1280" height="720"></canvas>
+          <div class="toast" id="toast"></div>
+          <div class="overlay" id="pauseLayer">
+            <div class="panel">
+              <p class="eyebrow">MISSION SUSPENDED</p>
+              <h2>PAUSED</h2>
+              <p>Take a breath. The facility can wait.</p>
+              <button class="primary" id="resume">RESUME MISSION</button
+              ><button class="secondary wide" id="restart">RESTART LEVEL</button
+              ><button class="text" data-menu>RETURN TO MAIN MENU</button>
+            </div>
+          </div>
+          <div class="overlay" id="winLayer">
+            <div class="panel">
+              <p class="eyebrow">MISSION REPORT</p>
+              <h2 id="winTitle">LEVEL CLEAR</h2>
+              <p id="winMessage">You reached the exit.</p>
+              <div class="result">
+                MISSION SCORE<strong id="resultScore">500</strong>
+              </div>
+              <button class="primary" id="nextLevel">NEXT MISSION →</button
+              ><button class="text" data-menu>MAIN MENU</button>
+            </div>
+          </div>
+          <div class="overlay" id="deadLayer">
+            <div class="panel">
+              <p class="eyebrow danger">SIGNAL LOST</p>
+              <h2>TRY AGAIN</h2>
+              <p>You hit a hazard or left the safe zone.</p>
+              <button class="primary" id="retry">RETRY MISSION</button
+              ><button class="text" data-menu>MAIN MENU</button>
+            </div>
+          </div>
+        </div>
+        <footer class="game-foot">
+          <span id="tip">✦ &nbsp; TIP: Press G to reverse gravity.</span
+          ><span
+            ><kbd>A</kbd><kbd>D</kbd> MOVE &nbsp; <kbd>SPACE</kbd> JUMP &nbsp;
+            <kbd>G</kbd> FLIP &nbsp; <kbd>ESC</kbd> PAUSE</span
+          >
+        </footer>
+      </section>
+    </main>
+    <script type="module" src="js/main.js"></script>
+  </body>
 </html>
